@@ -11,32 +11,88 @@ to get the final score, 188 * 24 = 4512.
 What will your final score be if you choose that board?
 '''
 
-f = open('./data_04.txt').read().split('\n\n')
+
+f = open('./data_04.in').read().split('\n\n')
 
 calls = [int(i) for i in f[0].split(',')]
-
 boards = f[1:]
 
 def bingo_when(calls):
     board = [[0 for _ in range(5)]for _ in range(5)]
-    for n, call in enumerate(calls):
+    for call in calls:
         i, j = call//5, call%5
         board[i][j] = 1
         for r in range(5):
-            if board[r]==[1]*5: return n
-            if all([board[c][r]==1 for c in range(5)]): return n
+            if board[r]==[1]*5 or all([board[c][r]==1 for c in range(5)]): 
+                return call
 
 
 first, winner = 10000, None
+last, last_winner = 0, None
+for i, board in enumerate(boards): 
+    nums_in_board = [int(i) for i in board.split()]
+    marked_nums = [num for num in calls if num in nums_in_board]
+    called_indexes = [nums_in_board.index(m) for m in marked_nums]
+    bingo_number = bingo_when(called_indexes)
+    when_win = calls.index(nums_in_board[bingo_number])
+
+    if first > when_win:
+        first = when_win
+        winner = i
+    if last < when_win:
+        last = when_win
+        last_winner = i
+
+'''Part I'''
+print(first, winner)
+print(sum([0 if i in calls[0:first+1] 
+            else i for i in [int(j) for j in boards[winner].split()]]) * calls[first])
+
+'''Part II'''
+print(last, last_winner)
+print(sum([0 if i in calls[0:last+1] 
+            else i for i in [int(j) for j in boards[last_winner].split()]]) * calls[last])
+
+
+
+# Some Cleaner solution
+
+first, winner = 10000, None
+last, last_winner = 0, None
 
 for i, board in enumerate(boards): 
-    num_lst = [int(i) for i in board.split()]
-    marked = [num for num in calls if num in num_lst]
-    index = [num_lst.index(m) for m in marked]
-    win_order = bingo_when(index)
-    if first > win_order:
-        first = win_order
-        winner = i
+    nums_in_board = [int(i) for i in board.split()]
+    board = [[0 for _ in range(5)]for _ in range(5)]
+    stop = False
 
-print([n for n in [int(i) for i in boards[winner].split()[first:]]])
-print(calls[first] * sum([n for n in [int(i) for i in boards[winner].split()[first:]]]))
+    for index, call in enumerate(calls):
+        if not stop:
+            for j, n in enumerate(nums_in_board):
+                if call == n:
+                    nums_in_board[j] = 0
+                    board[j//5][j%5] = 1
+                    break
+
+            for r in range(5):
+                if board[r]==[1]*5 or all([board[c][r]==1 for c in range(5)]):
+                    call_ord, player = index, i
+                    stop = True
+                    break
+    if call_ord<first:
+        first = call_ord
+        winner = player
+    if call_ord>last:
+        last = call_ord
+        last_winner = player
+    
+
+
+'''Part I'''
+print(first, winner)
+print(sum([0 if i in calls[0:first+1] 
+            else i for i in [int(j) for j in boards[winner].split()]]) * calls[first])
+# '''Part II'''
+print(last, last_winner)
+print(sum([0 if i in calls[0:last+1] 
+            else i for i in [int(j) for j in boards[last_winner].split()]]) * calls[last])
+
