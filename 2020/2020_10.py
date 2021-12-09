@@ -15,16 +15,21 @@ for i in range(len(l)-1):
         diff.append(3)
 
 d = Counter(diff)
-print(d)
+# print(d)
 print( d.get(1) * d.get(3) )
 
 
 # Part 2
-ans_2 = 1
-l = [0] + l
 
-for i in range(1,len(l)):
-    cnt = sum([l[i]-j in l for j in range(1,4)])
-    print(cnt)
-    ans_2 *= cnt
-print(ans_2)
+adapters = [0] + l
+valid_arrangements = [1] * len(adapters)
+for index in range(1, len(adapters)):
+    valid_arrangements[index] = sum(
+        valid_arrangements[src_index]
+        for src_index in range(max(0, index - 3), index)
+        if adapters[index] - adapters[src_index] <= 3
+    )
+
+
+
+print(valid_arrangements[-1])
