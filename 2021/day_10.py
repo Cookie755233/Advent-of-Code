@@ -78,101 +78,29 @@ scores_2 = {
 completion_scores = []
 for line in lst:
     remain = []
+    corrupted = False
     for i, syn in enumerate(line):
         
         if syn in open_brackets:
             remain.append(syn)
+            
         
         else:
             if remain[-1] == open_brackets[close_brackets.index(syn)]:
                 remain.pop(-1)
-
-    # print(remain)
-    score=0
-    for r in remain[::-1]:
-        score = score*5 + scores_2[r]
-    completion_scores.append(score)
+            else:
+                # part 2 
+                corrupted = True
+                break
+                      
+    if not corrupted:
+        score=0
+        for r in remain[::-1]:
+            score = score*5 + scores_2[r]
+        completion_scores.append(score)
 
 completion_scores.sort()
 print(completion_scores)
 ans_2 = completion_scores[len(completion_scores)//2]        
 print(ans_2)
-
-
-
-
-
-pairs = ["()", "[]", "<>", "{}"]
-bad_scores = {
-    ")": 3,
-    "]": 57,
-    "}": 1197,
-    ">": 25137
-}
-good_scores = {
-    "(": 1,
-    "[": 2,
-    "{": 3,
-    "<": 4
-}
-
-
-def parse(line):
-    stack = []
-    for char in line:
-        good = False
-        for p in pairs:
-            if char == p[0]:
-                stack.append(char)
-                good = True
-            elif char == p[1]:
-                if stack[-1] == p[0]:
-                    stack.pop()
-                    good = True
-
-        if not good:
-            return bad_scores[char]
-
-    return 0
-
-
-def complete(line):
-    stack = []
-    ans = 0
-    for char in line:
-        for p in pairs:
-            if char == p[0]:
-                stack.append(char)
-            elif char == p[1]:
-                if stack[-1] == p[0]:
-                    stack.pop()
-
-    for c in stack[::-1]:
-        ans *= 5
-        ans += good_scores[c]
-
-    return ans
-
-
-# Delete corrupted stuff
-data = [line for line in f if parse(line) == 0]
-
-scores = []
-for line in data:
-    scores.append(complete(line))
-
-scores.sort()
-print(scores)
-ans = scores[len(scores) // 2]
-print(ans)
-
-
-
-
-
-
-
-
-
-
 

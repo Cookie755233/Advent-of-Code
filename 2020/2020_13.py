@@ -1,3 +1,4 @@
+
 f = open('./2020_13.in').read().splitlines()
 
 '''
@@ -14,23 +15,65 @@ What is the ID of the earliest bus you can take to the airport multiplied by the
 t = int(f[0])
 
 earliest = 100000
-ID = None
+ans1 = None
 
 for i, bus in enumerate(f[1].split(',')):
-    # Part I
     if bus.isdigit():
         bus = int(bus)
+        this = bus * (t//bus)
         nxt = bus * (t//bus + 1)
         wait = nxt-t
-        print(nxt, wait)
         
         if wait < earliest:
             earliest = wait
-            ID = i
+            ans1 = bus * earliest
+            
+print(ans1)
+
+'''
+An x in the schedule means there are no constraints on what bus IDs must depart at that time.
+What is the earliest timestamp such that all of the listed bus IDs depart at offsets matching their positions in the list?
+'''
+
+buses = f[1].split(',')
+
+def mod_inverse(a,n):
+    # find some x such that (a*x) % n == 1
+    a = a % n
+    if n == 1:
+        return 1    
+    for x in range(1, n):
+        if (a*x) % n == 1:
+            return x
     
-    # Part II
-        nxt = bus * ((t-i)//bus + 1)
-        wait =  nxt - t
-        
-    # print(ID, earliest)
-print(earliest * ID)
+# n busses
+# bus k at index i departs at a time t+i
+# t+i % k == 0
+# t % k == -i
+# t % k = k-i
+# index = (k - (i%k)) % k
+def get_earliest_time():
+    ids = []
+    fullProduct = 1
+    for i in range(len(buses)):
+        item = buses[i]
+        if item != 'x':
+            k = int(item)
+            i = i % k
+            ids.append(((k-i)%k,k))
+            fullProduct *= k
+
+    total = 0
+    for i,k in ids:
+        partialProduct = fullProduct // k
+
+        inverse = mod_inverse(partialProduct,k)
+        assert (inverse * partialProduct) % k == 1
+
+        term = inverse * partialProduct * i
+        total += term
+
+    return total % fullProduct
+
+
+print(get_earliest_time())
