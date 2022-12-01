@@ -1,23 +1,32 @@
-with open('day01.txt') as f:
-    data = f.read().splitlines()    
-    
-elf = dict()
-tmp, elf_cnt = 0, 0
-for d in data:
-    try:
-        tmp += int(d)
-    except ValueError:
-        elf[str(elf_cnt)] = tmp
-        tmp = 0
-        elf_cnt += 1
-        continue
+import os
 
-# Solution 1
-sorted_elf = sorted(elf.items(), key=lambda item: item[1])
-print(
-    sorted_elf[-1]
-)
-# Solution 2
-print(
-    sum([i[-1] for i in sorted_elf[-3:]])
-)
+with open(f'{os.path.splitext(os.path.basename(__file__))[0]}.txt') as f:
+    INPUT = f.read()
+
+    
+def compute(data: str, 
+            part: bool) -> int:
+    # part 1
+    if not part:
+        p1 = max(
+                sum(int(line) for line in elf.splitlines())
+                for elf in data.split('\n\n')
+            )
+        
+        print(f'The Answer in Part 1 is : {p1}')
+    
+    # part 2
+    else:
+        elfs = sorted(
+            sum(int(line) for line in elf.splitlines())
+            for elf in data.split('\n\n')
+        )
+        
+        p2 = sum(elfs[-3:])
+        
+        print(f'The Answer in Part 2 is : {p2}')
+        
+if __name__ == '__main__':
+    compute(INPUT, 0)
+    compute(INPUT, 1) 
+        
